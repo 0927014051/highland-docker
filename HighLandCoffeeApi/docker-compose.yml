@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  mysql-highland-container:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=highland
+    volumes:
+      - /data/mysql
+    ports:
+      - "3307:3306"
+
+  springboot-highland-container:
+    image: thanhson25072002/highland:0.0.1
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql-highland-container
+    volumes:
+      - /data/HighLandCoffeeApi
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-highland-container:3306/highland?useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL5InnoDBDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_GENERATE_DDL: "true"
+      SERVER_PORT: 8084
